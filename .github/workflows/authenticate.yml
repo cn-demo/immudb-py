@@ -1,0 +1,17 @@
+ on:
+  workflow_dispatch:
+ 
+ authenticate:
+    runs-on: ubuntu-latest
+    steps:
+        - uses: actions/checkout@v2
+          name: Checkout code
+          
+        - name: Authenticate bil of materials
+          uses: docker://codenotary/vcn:bom-python3
+          with:
+            args: a git://. --lc-host ${{ secrets.CNIL_HOST }} --lc-port ${{ secrets.CNIL_GRPC_PORT }} --lc-api-key ${{ secrets.CNIL_API_KEY }} --bom --signerID ghactions --lc-skip-tls-verify
+
+        - name: Deploying after authentication
+          # Only runs if authenticate succeeds
+          run: echo "Succesful deployment"
