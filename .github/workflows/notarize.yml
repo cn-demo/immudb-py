@@ -3,12 +3,17 @@
 name: CI
 
 # Controls when the workflow will run
+
+
 on:
-  # Triggers the workflow on push or pull request events but only for the master branch
   push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
+    # Sequence of patterns matched against refs/heads
+    branches:    
+      - master
+      - 'mona/octocat'
+      - 'releases/**'
+    tags:        
+      - v*           # Push events to v1.0, v1.1, and v1.9 tags
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
