@@ -10,7 +10,6 @@ on:
     # Sequence of patterns matched against refs/heads
     branches:    
       - master
-      - 'mona/octocat'
       - 'releases/**'
     tags:        
       - v*           # Push events to v1.0, v1.1, and v1.9 tags
@@ -30,9 +29,29 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
+        name: Checkout code
 
-      # Runs a single command using the runners shell
+      - name: Build the project
+        run: sleep 5 && echo "Project was built" 
+
       - name: VCN generate and notarize BoM for Python projects
         uses: docker://codenotary/vcn:bom-python3
         with:
            args: n git://. --lc-host ${{ secrets.CNIL_HOST }} --lc-port ${{ secrets.CNIL_GRPC_PORT }} --lc-api-key ${{ secrets.CNIL_API_KEY }} --bom --lc-skip-tls-verify
+  
+  deploy:
+    runs-on: ubuntu-latest
+      steps:
+        # Simulates retrieving an artifact, ideally it has been previously notarized
+        - uses: actions/checkout@v2
+          name: Checkout code
+
+          
+        - name: VCN generate and notarize BoM for Python projects
+          uses: docker://codenotary/vcn:bom-python3
+          with:
+            args: a git://. --lc-host ${{ secrets.CNIL_HOST }} --lc-port ${{ secrets.CNIL_GRPC_PORT }} --lc-api-key ${{ secrets.CNIL_API_KEY }} --bom --signerID ghactions --lc-skip-tls-verify
+
+       - name: Deploying after authentication
+         run: echo "Succesful deployment"
+
