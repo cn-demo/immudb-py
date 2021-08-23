@@ -1,0 +1,17 @@
+ name: Untrust BoM
+ on:
+  workflow_dispatch:
+ 
+ 
+ jobs:
+  authenticate:
+     runs-on: ubuntu-latest
+     steps:
+         - uses: actions/checkout@v2
+           name: Checkout code
+
+         - name: Untrust repository and bill of materials (after a scan fails or some other situation)
+           uses: docker://codenotary/vcn:bom-python3
+           with:
+             args: untrust git://. --lc-host ${{ secrets.CNIL_HOST }} --lc-port ${{ secrets.CNIL_GRPC_PORT }} --lc-api-key ${{ secrets.CNIL_API_KEY }} --bom --lc-skip-tls-verify
+
