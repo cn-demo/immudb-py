@@ -28,9 +28,6 @@ jobs:
 
       # Runs a single command using the runners shell
       - name: VCN generate and notarize BoM for Python projects
-        uses: codenotary/vcn-notarize-bom-python-github-action@v1.0.0
+        uses: docker://codenotary/vcn:bom-python3
         with:
-          asset: git://.
-          cnil_host: ${{ secrets.CNIL_HOST }}
-          cnil_grpc_port: ${{ secrets.CNIL_GRPC_PORT }}
-          cnil_api_key: ${{ secrets.CNIL_API_KEY }}
+           args: n git://. --lc-host ${{ secrets.CNIL_HOST }} --lc-port ${{ secrets.CNIL_GRPC_PORT }} --lc-api-key ${{ secrets.CNIL_API_KEY }} --bom --lc-skip-tls-verify
