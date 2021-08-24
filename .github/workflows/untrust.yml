@@ -9,9 +9,11 @@
      steps:
          - uses: actions/checkout@v2
            name: Checkout code
-
-         - name: Untrust repository and bill of materials (after a scan fails or some other situation)
-           uses: docker://codenotary/vcn:bom-python3
+           
+         - uses: codenotary/vcn-untrust-bom-python-github-action@v1.0.0
+          # uses: codenotary/vcn-untrust-bom-python-github-action@main
            with:
-             args: untrust git://. --lc-host ${{ secrets.CNIL_HOST }} --lc-port ${{ secrets.CNIL_GRPC_PORT }} --lc-api-key ${{ secrets.CNIL_API_KEY }} --bom --lc-skip-tls-verify
-
+             asset: git://.
+             cnil_host: ${{ secrets.CNIL_HOST }}
+             cnil_grpc_port: ${{ secrets.CNIL_GRPC_PORT }}
+             cnil_api_key: ${{ secrets.CNIL_API_KEY }}
