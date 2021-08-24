@@ -1,0 +1,27 @@
+ name: Authenticate BoM and repository
+ on:
+  workflow_dispatch:
+ 
+ 
+ jobs:
+  authenticate:
+     runs-on: ubuntu-latest
+     steps:
+         - uses: actions/checkout@v2
+           name: Checkout code
+
+         - name: Authenticate Python project with BoM
+        #--> Run the GitHub action
+           uses: codenotary/vcn-authenticate-bom-python-github-action@v1.0.0
+           with:
+            asset: git://.
+            cnil_host: ${{ secrets.CNIL_HOST }}
+            cnil_grpc_port: ${{ secrets.CNIL_GRPC_PORT }}
+            cnil_api_key: ${{ secrets.CNIL_API_KEY }}
+            # the signer ID is always required (even if it's the same as the one of the CNIL API key)
+            # - hardcode it here
+            signer_id: codenotary 
+
+         - name: Deploying after authentication
+           # Only runs if authenticate succeeds
+           run: echo "Succesful deployment"
