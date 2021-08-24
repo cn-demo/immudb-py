@@ -34,9 +34,13 @@ jobs:
         run: sleep 5 && echo "Project was built" 
 
       - name: VCN generate and notarize BoM for Python projects
-        uses: docker://codenotary/vcn:bom-python3
+        uses: codenotary/vcn-notarize-bom-python-github-action@v1.0.0
         with:
-           args: n git://. --lc-host ${{ secrets.CNIL_HOST }} --lc-port ${{ secrets.CNIL_GRPC_PORT }} --lc-api-key ${{ secrets.CNIL_API_KEY }} --bom --lc-skip-tls-verify
+          asset: git://.
+          cnil_host: ${{ secrets.CNIL_HOST }}
+          cnil_grpc_port: ${{ secrets.CNIL_GRPC_PORT }}
+          cnil_api_key: ${{ secrets.CNIL_API_KEY }}
+
   
   deploy_expected_failure:
     # This job can fail, it doens't wait for the repository to be notarized
@@ -47,14 +51,17 @@ jobs:
         - uses: actions/checkout@v2
           name: Checkout code
 
-
-        - name: VCN generate and notarize BoM for Python projects
-          uses: docker://codenotary/vcn:bom-python3
+        - name: Authenticate Python project with BoM
+        #--> Run the GitHub action
+          uses: codenotary/vcn-authenticate-bom-python-github-action@v1.0.0
           with:
-            args: a git://. --lc-host ${{ secrets.CNIL_HOST }} --lc-port ${{ secrets.CNIL_GRPC_PORT }} --lc-api-key ${{ secrets.CNIL_API_KEY }} --bom --signerID ghactions --lc-skip-tls-verify
-
-        - name: Deploying after authentication
-          run: echo "Succesful deployment"
+            asset: git://.
+            cnil_host: ${{ secrets.CNIL_HOST }}
+            cnil_grpc_port: ${{ secrets.CNIL_GRPC_PORT }}
+            cnil_api_key: ${{ secrets.CNIL_API_KEY }}
+            # the signer ID is always required (even if it's the same as the one of the CNIL API key)
+            # - hardcode it here
+            signer_id: ghactions
 
 
   deploy:
@@ -65,11 +72,18 @@ jobs:
         # Simulates retrieving an artifact, ideally it has been previously notarized
         - uses: actions/checkout@v2
           name: Checkout code
-
-        - name: VCN generate and notarize BoM for Python projects
-          uses: docker://codenotary/vcn:bom-python3
+          
+        - name: Authenticate Python project with BoM
+          uses: codenotary/vcn-authenticate-bom-python-github-action@v1.0.0
           with:
-            args: a git://. --lc-host ${{ secrets.CNIL_HOST }} --lc-port ${{ secrets.CNIL_GRPC_PORT }} --lc-api-key ${{ secrets.CNIL_API_KEY }} --bom --signerID ghactions --lc-skip-tls-verify
+            asset: git://.
+            cnil_host: ${{ secrets.CNIL_HOST }}
+            cnil_grpc_port: ${{ secrets.CNIL_GRPC_PORT }}
+            cnil_api_key: ${{ secrets.CNIL_API_KEY }}
+            # the signer ID is always required (even if it's the same as the one of the CNIL API key)
+            # - hardcode it here
+            signer_id: ghactions
+
 
         - name: Deploying after authentication
           run: echo "Succesful deployment"
